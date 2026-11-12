@@ -1,4 +1,4 @@
-"""Shared pytest fixtures for ZIT client tests."""
+"""Shared pytest fixtures for MEGAMIND client tests."""
 
 from __future__ import annotations
 

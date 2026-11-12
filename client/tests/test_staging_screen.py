@@ -6,16 +6,15 @@ from pathlib import Path
 
 import git
 import pytest
-
-from zit.app import ZitApp
-from zit.screens.dashboard import DashboardScreen
-from zit.screens.staging import StagingScreen
-from zit.widgets.confirm_dialog import ConfirmDialog
+from megamind.app import MegaMindApp
+from megamind.screens.dashboard import DashboardScreen
+from megamind.screens.staging import StagingScreen
+from megamind.widgets.confirm_dialog import ConfirmDialog
 
 
 @pytest.mark.anyio
 async def test_navigate_to_staging(dirty_repo: git.Repo) -> None:
-    app = ZitApp(repo_path=dirty_repo.working_dir)
+    app = MegaMindApp(repo_path=dirty_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -38,7 +37,7 @@ async def test_navigate_to_staging(dirty_repo: git.Repo) -> None:
 
 @pytest.mark.anyio
 async def test_staging_toggle_and_actions(dirty_repo: git.Repo) -> None:
-    app = ZitApp(repo_path=dirty_repo.working_dir)
+    app = MegaMindApp(repo_path=dirty_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -74,7 +73,7 @@ async def test_staging_toggle_and_actions(dirty_repo: git.Repo) -> None:
 
 @pytest.mark.anyio
 async def test_staging_discard_dialog(dirty_repo: git.Repo, temp_dir: Path) -> None:
-    app = ZitApp(repo_path=dirty_repo.working_dir)
+    app = MegaMindApp(repo_path=dirty_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()

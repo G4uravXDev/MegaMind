@@ -1,19 +1,20 @@
-# ZIT – AI-Powered Terminal Git Assistant
+# MEGAMIND – AI-Powered Terminal Git Assistant
 
-[![Python Version](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Python Version](https://img.shields.io/badge/python-3.11%2B%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![TUI Framework](https://img.shields.io/badge/TUI-Textual-green.svg)](https://textual.textualize.io/)
 [![Backend](https://img.shields.io/badge/backend-Django%20REST-red.svg)](https://www.django-rest-framework.org/)
+[![AI Engine](https://img.shields.io/badge/AI-Amazon%20Bedrock-orange.svg)](https://aws.amazon.com/bedrock/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**ZIT** is a high-performance terminal UI (TUI) and AI-assisted Git companion designed to streamline everyday developer workflows. It brings visual clarity, safety guards, and intelligent automation directly to your terminal—from staging and conventional commits to interactive 3-panel merge conflict resolution, branch management, topology log graphs, time travel, and contextual AI mentoring.
+**MEGAMIND** is a high-performance terminal UI (TUI) and AI-assisted Git companion designed to streamline everyday developer workflows. It brings visual clarity, safety guards, and intelligent automation directly to your terminal—from staging and conventional commits to interactive 3-panel merge conflict resolution, branch management, topology log graphs, time travel, and contextual AI mentoring.
 
 ---
 
-## 🏗 System Architecture
+## 🏛️ System Architecture
 
 ```text
                ┌─────────────────────────────────────────────────────┐
-               │                  ZIT Terminal (TUI)                 │
+               │                  MegaMind Terminal (TUI)                 │
                │  (Textual · GitPython · HTTPX · Rich · Safe Modals)  │
                └──────────────┬──────────────────────┬───────────────┘
                               │                      │
@@ -25,26 +26,35 @@
                      │    (.git)      │   │ (Auth, Sessions, History) │
                      └────────────────┘   └──────────┬────────────────┘
                                                      │
-                                             Proxy / Invoke
+                                             AWS SDK (boto3)
                                                      │
                                                      ▼
                                           ┌─────────────────────┐
-                                          │  AI Engine / Lambda │
-                                          │  (Bedrock/OpenAI/   │
-                                          │   Gemini / Mock)    │
+                                          │  AWS Lambda Worker  │
+                                          │     (megamind-ai)        │
+                                          └──────────┬──────────┘
+                                                     │
+                                             Converse API
+                                                     │
+                                                     ▼
+                                          ┌─────────────────────┐
+                                          │    Amazon Bedrock   │
+                                          │ (Claude 3.5 Sonnet) │
                                           └─────────────────────┘
 ```
 
 The repository is structured as a modular monorepo:
 
-- **`client/`**: Full-featured Textual TUI client. Encapsulates all Git operations inside `GitService` (pure GitPython) and all AI communications inside `ApiClient` (HTTPX). Includes non-blocking worker threads, destructive action confirmation dialogs, and an offline mock mode.
-- **`backend/`**: Django REST Framework backend providing user authentication (DRF Token), session persistence, and API proxy routing.
-- **`lambda/`**: Serverless AI inference functions for generating commit messages, resolving complex merge conflicts, generating unit test suites, and conversational Git mentoring.
-- **`docs/`**: Technical documentation, architecture decision records, and specifications.
+- **[`client/`](client/)**: Full-featured Textual TUI client. Encapsulates all Git operations inside `GitService` (pure GitPython) and all AI communications inside `ApiClient` (HTTPX). Includes non-blocking worker threads, destructive action confirmation dialogs, and an offline mock mode.
+- **[`backend/`](backend/)**: Django REST Framework backend providing user authentication (DRF Token), session persistence, and API proxy routing.
+- **[`lambda/`](lambda/)**: Serverless AI inference worker running on Python 3.12. Invokes Amazon Bedrock's Converse API with prompt-injection defense, zero-payload logging, and robust throttling retry logic.
+- **[`docs/`](docs/)**: In-depth architectural specifications, API schemas, privacy documentation, deployment guides, and testing procedures.
 
 ---
 
-## ⚡ Key Features
+## ⚡ Key Features & Keybinding Reference
+
+Press **`?`** anywhere in MEGAMIND to open the instant in-app cheatsheet overlay.
 
 | Feature | Key | Description |
 |---|---|---|
@@ -61,13 +71,54 @@ The repository is structured as a modular monorepo:
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### 1. Prerequisites
-- Python 3.11+
+- Python 3.11 or 3.12
 - Git installed and accessible on your `PATH`
 
-### 2. Running the Backend Server
+---
+
+### 2. Running the Terminal Client
+
+#### Option A: Offline / Mock Mode (Zero Setup Required)
+MEGAMIND includes an offline mock mode (`MEGAMIND_MOCK=1`) so you can explore the complete TUI and all workflows immediately without configuring backend servers or AWS credentials:
+
+```powershell
+# Windows PowerShell
+cd client
+.venv\Scripts\Activate.ps1
+$env:MEGAMIND_MOCK="1"
+python -m megamind
+```
+
+To run on a specific repository:
+```powershell
+python -m megamind C:\path\to\your\repo
+```
+
+```bash
+# macOS / Linux
+cd client
+source .venv/bin/activate
+export MEGAMIND_MOCK="1"
+python -m megamind
+```
+
+#### Option B: Connected to Django Backend
+```powershell
+# Windows PowerShell
+cd client
+.venv\Scripts\Activate.ps1
+$env:MEGAMIND_API_URL="http://127.0.0.1:8000"
+$env:MEGAMIND_TOKEN="1ab00d6ac0f622ab56b655f9cfd553dcdff28292"
+$env:MEGAMIND_MOCK="0"
+python -m megamind
+```
+
+---
+
+### 3. Running the Django Backend Server
 
 ```powershell
 # Windows PowerShell
@@ -77,84 +128,75 @@ python manage.py migrate
 python manage.py runserver 127.0.0.1:8000
 ```
 
-- **API Base URL:** `http://127.0.0.1:8000`
-- **Admin Interface:** `http://127.0.0.1:8000/admin/` (Default admin: `admin` / `AdminPass123!`)
-- **Default DRF Auth Token:** `1ab00d6ac0f622ab56b655f9cfd553dcdff28292`
+- **Base URL:** `http://127.0.0.1:8000/`
+- **Admin Panel:** `http://127.0.0.1:8000/admin/` (Default admin: `admin` / `AdminPass123!`)
+- **Default Token:** `1ab00d6ac0f622ab56b655f9cfd553dcdff28292`
 
 ---
 
-### 3. Running the Terminal Client
+### 4. Packaging the AI Lambda Function
 
-#### Option A: Offline / Mock Mode (No LLM Required)
-ZIT includes a built-in mock mode (`ZIT_MOCK=1`) so you can explore the complete TUI and all workflows immediately without configuring API keys:
+The AWS Lambda worker requires Python 3.12 and bundles only standard library code:
 
 ```powershell
-cd client
-.venv\Scripts\Activate.ps1
-$env:ZIT_MOCK="1"
-python -m zit
+# Windows PowerShell
+cd lambda
+.\build.ps1
 ```
 
-You can also pass a path to any Git repository:
-```powershell
-python -m zit C:\path\to\your\repo
+```bash
+# macOS / Linux
+cd lambda
+chmod +x build.sh
+./build.sh
 ```
 
-#### Option B: Connected to Backend
-```powershell
-cd client
-.venv\Scripts\Activate.ps1
-$env:ZIT_API_URL="http://127.0.0.1:8000"
-$env:ZIT_TOKEN="1ab00d6ac0f622ab56b655f9cfd553dcdff28292"
-python -m zit
-```
+This creates the deployment artifact at `lambda/dist/megamind-ai.zip`.
 
 ---
 
-## 🤖 Connecting an LLM to ZIT
+## ⚙️ Environment Variables Reference
 
-To enable live AI generation (instead of mock mode), you can connect any LLM provider (OpenAI, Anthropic Claude, Google Gemini, or AWS Bedrock):
-
-1. **Backend Integration**:
-   Configure your LLM credentials in `backend/.env`:
-   ```dotenv
-   OPENAI_API_KEY=sk-...
-   # or
-   GEMINI_API_KEY=AIzaSy...
-   # or
-   AWS_REGION=us-east-1
-   LAMBDA_FUNCTION_NAME=zit-ai
-   ```
-
-2. **Endpoints Implemented by ZIT Client**:
-   The client communicates with the backend via the following REST contracts:
-   - `POST /api/ai/commit-message/`: Generates a commit message from `{diff: str, recent_commits: list[str]}`.
-   - `POST /api/ai/resolve-conflict/`: Resolves merge conflict from `{file_path, ours, theirs, base, context_before, context_after}`.
-   - `POST /api/ai/mentor/`: Answers conversational queries from `{question: str, repo_context: dict, conversation_id: str}`.
-   - `POST /api/ai/coverage/`: Generates unit tests from `{file_path: str, source: str}`.
+| Component | Variable | Description | Default |
+|---|---|---|---|
+| **Client** | `MEGAMIND_API_URL` | Base URL of the Django backend | `http://127.0.0.1:8000` |
+| **Client** | `MEGAMIND_TOKEN` | Django REST Framework authentication token | *(empty)* |
+| **Client** | `MEGAMIND_MOCK` | Enable offline mock mode (`1` = mock, `0` = live API) | `0` |
+| **Backend** | `DJANGO_SECRET_KEY` | Cryptographic secret for Django | `change-me` |
+| **Backend** | `DATABASE_URL` | Database connection string (PostgreSQL/SQLite) | `sqlite3` (dev) |
+| **Backend** | `LAMBDA_FUNCTION_NAME`| Name of deployed AWS Lambda function | `megamind-ai` |
+| **Backend** | `AWS_REGION` | AWS Region for backend boto3 calls | `us-east-1` |
+| **Lambda** | `BEDROCK_MODEL_ID` | Amazon Bedrock model ID or inference profile | `us.anthropic.claude-3-5-sonnet-20241022-v2:0` |
 
 ---
 
-## 🧪 Testing & Quality Assurance
+## 🧪 Testing & Verification
 
-The ZIT terminal client has an extensive test suite with **65 automated tests** covering all screens, widgets, modal flows, and Git services:
+The project includes automated test suites covering all tiers:
 
 ```powershell
-# Run all tests
+# Run Client UI & Git Tests (65 tests)
 cd client
 .venv\Scripts\python.exe -m pytest -v
 
-# Run linter & formatter checks
-.venv\Scripts\ruff.exe check zit tests
-.venv\Scripts\ruff.exe format --check zit tests
+# Run Lambda AI & Privacy Tests (32 tests)
+cd lambda
+..\client\.venv\Scripts\python.exe -m pytest tests -v
+
+# Lint & Format Checking
+.venv\Scripts\ruff.exe check megamind tests
+.venv\Scripts\ruff.exe format --check megamind tests
 ```
 
 ---
 
-## 🛡 Safety & Design Principles
+## 📚 In-Depth Documentation
 
-- **No Data Loss Without Consent:** Destructive operations (`git reset --hard`, discarding local modifications, branch deletion, dropping stashes) are always gated behind an explicit `ConfirmDialog` stating what will be affected.
-- **Traceback-Free Experience:** All GitPython and HTTP errors are trapped and surfaced in dismissible modal panels with human-readable diagnostic messages.
-- **Non-Blocking UI:** Heavy Git diffs, network requests, and AI queries run in background worker threads with loading overlays, keeping terminal interactions fluid and responsive.
-- **Cross-Platform:** Built with `pathlib` for consistent execution across Windows, macOS, and Linux.
+For detailed technical guides, see the [`docs/`](docs/) directory:
 
+- 🏗️ [**Architecture & Design**](docs/architecture.md): Sequence diagrams, request flows, and component responsibilities.
+- 📡 [**REST API Reference**](docs/api.md): Endpoint specifications, payload schemas, and PowerShell examples.
+- 🔒 [**Privacy & Security**](docs/privacy.md): Zero-payload logging policy, data boundaries, and retention guarantees.
+- 🚀 [**Production Deployment**](docs/deployment.md): PostgreSQL provisioning, Gunicorn/Nginx setup, Lambda deployment, and cost estimates.
+- 🧪 [**Testing Guide**](docs/testing.md): Pytest workflows, mocked Converse API tests, and mock mode usage.
+- ⚡ [**Lambda Service README**](lambda/README.md): IAM policies, cross-region inference profiles, and sample AWS test events.

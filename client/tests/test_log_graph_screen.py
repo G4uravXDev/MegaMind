@@ -4,16 +4,15 @@ from __future__ import annotations
 
 import git
 import pytest
-
-from zit.app import ZitApp
-from zit.screens.dashboard import DashboardScreen
-from zit.screens.log_graph import LogGraphScreen
-from zit.services.git_service import GitService
+from megamind.app import MegaMindApp
+from megamind.screens.dashboard import DashboardScreen
+from megamind.screens.log_graph import LogGraphScreen
+from megamind.services.git_service import GitService
 
 
 @pytest.mark.anyio
 async def test_navigate_to_log_graph(repo_with_commits: git.Repo) -> None:
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -71,7 +70,7 @@ def test_log_graph_empty_repo(empty_repo: git.Repo) -> None:
 @pytest.mark.anyio
 async def test_log_graph_detail_view(repo_with_commits: git.Repo) -> None:
     """Verifies pressing Enter on a commit updates commit detail display."""
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()

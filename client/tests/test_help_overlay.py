@@ -6,16 +6,15 @@ import os
 
 import git
 import pytest
-
-from zit.app import ZitApp
-from zit.screens.dashboard import DashboardScreen
-from zit.widgets.help_overlay import HelpModal
+from megamind.app import MegaMindApp
+from megamind.screens.dashboard import DashboardScreen
+from megamind.widgets.help_overlay import HelpModal
 
 
 @pytest.mark.anyio
 async def test_help_modal_direct() -> None:
     """HelpModal renders quick reference text and dismisses."""
-    app = ZitApp()
+    app = MegaMindApp()
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -46,8 +45,8 @@ async def test_help_modal_direct() -> None:
 @pytest.mark.anyio
 async def test_global_question_mark_shortcut(repo_with_commits: git.Repo) -> None:
     """Pressing '?' from any screen opens the HelpModal and Esc closes it."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -63,6 +62,6 @@ async def test_global_question_mark_shortcut(repo_with_commits: git.Repo) -> Non
             await pilot.pause()
             assert isinstance(app.screen, DashboardScreen)
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]
         if app._git_service:
             app._git_service.close()

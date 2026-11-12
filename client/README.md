@@ -1,6 +1,6 @@
-# ZIT – Terminal AI Git Assistant
+# MEGAMIND – Terminal AI Git Assistant
 
-**ZIT** is a high-performance terminal UI (TUI) and AI-assisted Git companion built with **Textual** and **GitPython**. It streamlines everyday Git workflows—from staging and committing to complex operations like interactive 3-panel merge conflict resolution, branch management, visual log exploration, time travel, and contextual AI mentoring.
+**MEGAMIND** is a high-performance terminal UI (TUI) and AI-assisted Git companion built with **Textual** and **GitPython**. It streamlines everyday Git workflows—from staging and committing to complex operations like interactive 3-panel merge conflict resolution, branch management, visual log exploration, time travel, and contextual AI mentoring.
 
 ---
 
@@ -46,36 +46,36 @@ Configure your environment before launching:
 
 | Variable | Description | Default |
 |---|---|---|
-| `ZIT_API_URL` | Base URL of the ZIT backend server | `http://127.0.0.1:8000` |
-| `ZIT_TOKEN` | Django REST Framework authentication token | *(empty)* |
-| `ZIT_MOCK` | Enable offline mock mode (returns canned AI responses) | `0` (set to `1` for offline) |
+| `MEGAMIND_API_URL` | Base URL of the MEGAMIND backend server | `http://127.0.0.1:8000` |
+| `MEGAMIND_TOKEN` | Django REST Framework authentication token | *(empty)* |
+| `MEGAMIND_MOCK` | Enable offline mock mode (returns canned AI responses) | `0` (set to `1` for offline) |
 
 To run completely offline without the Django backend:
 
 ```powershell
-$env:ZIT_MOCK="1"
-python -m zit
+$env:MEGAMIND_MOCK="1"
+python -m megamind
 ```
 
 To run with backend authentication:
 
 ```powershell
-$env:ZIT_API_URL="http://127.0.0.1:8000"
-$env:ZIT_TOKEN="<your-drf-token>"
-python -m zit
+$env:MEGAMIND_API_URL="http://127.0.0.1:8000"
+$env:MEGAMIND_TOKEN="<your-drf-token>"
+python -m megamind
 ```
 
 ---
 
 ## ⌨️ Features & Keybinding Reference
 
-Press **`?`** anywhere in ZIT to open the instant in-app cheatsheet.
+Press **`?`** anywhere in MEGAMIND to open the instant in-app cheatsheet.
 
 ### 🌐 Global Shortcuts
 - **`?` / `F1`** — Open Help cheatsheet overlay
 - **`Esc`** — Return to the Dashboard or dismiss the active modal
 - **`r`** — Refresh data on the current screen
-- **`q`** — Quit ZIT
+- **`q`** — Quit MEGAMIND
 
 ---
 
@@ -174,8 +174,8 @@ Available on both Dashboard and Staging screens for any highlighted file:
 
 1. **Separation of Concerns:**
    - Textual screens never import `git` or `httpx` directly.
-   - All Git operations are encapsulated inside `zit/services/git_service.py`.
-   - All REST/AI communications are encapsulated inside `zit/services/api_client.py`.
+   - All Git operations are encapsulated inside `megamind/services/git_service.py`.
+   - All REST/AI communications are encapsulated inside `megamind/services/api_client.py`.
 2. **Non-Blocking UI:**
    - All API network calls and AI generations run in Textual worker threads (`@work(thread=True)`).
    - Semi-transparent `LoadingOverlay` provides user feedback during operations.
@@ -199,7 +199,7 @@ Run Ruff linter and formatting checks:
 
 ```powershell
 Set-Location client
-.venv\Scripts\ruff.exe check zit tests
-.venv\Scripts\ruff.exe format --check zit tests
+.venv\Scripts\ruff.exe check megamind tests
+.venv\Scripts\ruff.exe format --check megamind tests
 ```
 

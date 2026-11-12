@@ -4,17 +4,16 @@ from __future__ import annotations
 
 import git
 import pytest
-
-from zit.app import ZitApp
-from zit.screens.branches import BranchesScreen
-from zit.screens.dashboard import DashboardScreen
-from zit.services.exceptions import DestructiveActionError, GitServiceError
-from zit.widgets.confirm_dialog import ConfirmDialog
+from megamind.app import MegaMindApp
+from megamind.screens.branches import BranchesScreen
+from megamind.screens.dashboard import DashboardScreen
+from megamind.services.exceptions import DestructiveActionError, GitServiceError
+from megamind.widgets.confirm_dialog import ConfirmDialog
 
 
 @pytest.mark.anyio
 async def test_navigate_to_branches(repo_with_commits: git.Repo) -> None:
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -37,7 +36,7 @@ async def test_navigate_to_branches(repo_with_commits: git.Repo) -> None:
 
 def test_git_service_branch_operations(repo_with_commits: git.Repo) -> None:
     service = repo_with_commits  # underlying repo
-    from zit.services.git_service import GitService
+    from megamind.services.git_service import GitService
 
     git_service = GitService(service.working_dir)
     try:
@@ -82,7 +81,7 @@ def test_switch_conflict_handling(repo_with_commits: git.Repo) -> None:
     """Verifies clear error when switching branches with conflicting local changes."""
     from pathlib import Path
 
-    from zit.services.git_service import GitService
+    from megamind.services.git_service import GitService
 
     service = GitService(repo_with_commits.working_dir)
     try:
@@ -117,7 +116,7 @@ def test_switch_conflict_handling(repo_with_commits: git.Repo) -> None:
 @pytest.mark.anyio
 async def test_branches_screen_delete_confirmation(repo_with_commits: git.Repo) -> None:
     """Verifies delete confirmation dialog on BranchesScreen."""
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     app.git_service.create_branch("to-delete")
 
     try:

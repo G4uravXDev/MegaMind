@@ -6,11 +6,10 @@ import os
 
 import git
 import pytest
-
-from zit.app import ZitApp
-from zit.screens.dashboard import DashboardScreen
-from zit.screens.time_travel import TimeTravelScreen
-from zit.services.git_service import GitService
+from megamind.app import MegaMindApp
+from megamind.screens.dashboard import DashboardScreen
+from megamind.screens.time_travel import TimeTravelScreen
+from megamind.services.git_service import GitService
 
 # ── GitService stash / reset / reflog unit tests ─────────────────────
 
@@ -82,7 +81,7 @@ def test_stash_save_clean_tree_raises(repo_with_commits: git.Repo) -> None:
     """Saving a stash with a clean working tree should raise."""
     gs = GitService(repo_with_commits.working_dir)
     try:
-        from zit.services.exceptions import GitServiceError
+        from megamind.services.exceptions import GitServiceError
 
         with pytest.raises(GitServiceError, match="Nothing to stash"):
             gs.stash_save("should fail")
@@ -144,7 +143,7 @@ def test_reset_invalid_mode(repo_with_commits: git.Repo) -> None:
     """Invalid reset mode should raise."""
     gs = GitService(repo_with_commits.working_dir)
     try:
-        from zit.services.exceptions import GitServiceError
+        from megamind.services.exceptions import GitServiceError
 
         with pytest.raises(GitServiceError, match="Invalid reset mode"):
             gs.reset("invalid", "HEAD")
@@ -191,8 +190,8 @@ def test_restore_to_reflog(repo_with_commits: git.Repo) -> None:
 @pytest.mark.anyio
 async def test_navigate_to_time_travel(repo_with_commits: git.Repo) -> None:
     """Pressing 't' on dashboard pushes TimeTravelScreen."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -209,14 +208,14 @@ async def test_navigate_to_time_travel(repo_with_commits: git.Repo) -> None:
             text = str(header.render())
             assert "Stash" in text
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]
 
 
 @pytest.mark.anyio
 async def test_time_travel_tab_switching(repo_with_commits: git.Repo) -> None:
     """Pressing 1, 2, 3 switches between tabs."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -248,7 +247,7 @@ async def test_time_travel_tab_switching(repo_with_commits: git.Repo) -> None:
             header = screen.query_one("#tt-panel-header", Label)
             assert "Stash" in str(header.render())
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]
 
 
 @pytest.mark.anyio
@@ -256,8 +255,8 @@ async def test_time_travel_escape_returns_to_dashboard(
     repo_with_commits: git.Repo,
 ) -> None:
     """Pressing Esc on TimeTravelScreen returns to dashboard."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -269,4 +268,4 @@ async def test_time_travel_escape_returns_to_dashboard(
             await pilot.pause()
             assert isinstance(app.screen, DashboardScreen)
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]

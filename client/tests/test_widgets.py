@@ -1,17 +1,16 @@
-"""Tests for ZitApp and widgets."""
+"""Tests for MegaMindApp and widgets."""
 
 from __future__ import annotations
 
 import pytest
-
-from zit.app import ZitApp
-from zit.screens.dashboard import DashboardScreen
-from zit.widgets.confirm_dialog import ConfirmDialog
+from megamind.app import MegaMindApp
+from megamind.screens.dashboard import DashboardScreen
+from megamind.widgets.confirm_dialog import ConfirmDialog
 
 
 @pytest.mark.anyio
-async def test_zit_app_mount(repo_with_commits) -> None:
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+async def test_megamind_app_mount(repo_with_commits) -> None:
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -26,7 +25,7 @@ async def test_zit_app_mount(repo_with_commits) -> None:
 
 @pytest.mark.anyio
 async def test_confirm_dialog_cancel(repo_with_commits) -> None:
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             dialog = ConfirmDialog(

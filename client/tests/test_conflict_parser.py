@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from zit.services.conflict_parser import (
+from megamind.services.conflict_parser import (
     apply_hunk_resolution,
     has_conflict_markers,
     parse_conflicts,

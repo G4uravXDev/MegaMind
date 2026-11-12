@@ -6,9 +6,8 @@ from pathlib import Path
 
 import git
 import pytest
-
-from zit.services.exceptions import GitServiceError, RepoNotFoundError
-from zit.services.git_service import GitService
+from megamind.services.exceptions import GitServiceError, RepoNotFoundError
+from megamind.services.git_service import GitService
 
 
 def test_repo_not_found(temp_dir: Path) -> None:

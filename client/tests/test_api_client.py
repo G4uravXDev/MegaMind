@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from zit.services.api_client import ApiClient
+from megamind.services.api_client import ApiClient
 
 
 def test_mock_mode_commit_message() -> None:
@@ -11,7 +11,7 @@ def test_mock_mode_commit_message() -> None:
         "diff --git a/test.py b/test.py\n+new", ["feat: previous"]
     )
     assert "feat: update" in msg
-    assert "ZIT mock" in msg
+    assert "MEGAMIND mock" in msg
 
 
 def test_mock_mode_resolve_conflict() -> None:
@@ -23,7 +23,7 @@ def test_mock_mode_resolve_conflict() -> None:
     )
     assert "resolution" in res
     assert "explanation" in res
-    assert "Resolved by ZIT Mock" in res["resolution"]
+    assert "Resolved by MEGAMIND Mock" in res["resolution"]
 
 
 def test_mock_mode_mentor() -> None:
@@ -33,7 +33,7 @@ def test_mock_mode_mentor() -> None:
         repo_context={"branch": "main", "staged_count": 0, "unstaged_count": 0},
     )
     assert "answer" in res
-    assert "ZIT Mentor (Mock Mode)" in res["answer"]
+    assert "MegaMind Mentor (Mock Mode)" in res["answer"]
     assert res["conversation_id"] == "mock-conv-123"
 
 

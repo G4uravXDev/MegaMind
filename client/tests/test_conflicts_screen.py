@@ -6,11 +6,10 @@ import os
 
 import git
 import pytest
-
-from zit.app import ZitApp
-from zit.screens.conflicts import ConflictResolutionScreen
-from zit.screens.dashboard import DashboardScreen
-from zit.services.git_service import GitService
+from megamind.app import MegaMindApp
+from megamind.screens.conflicts import ConflictResolutionScreen
+from megamind.screens.dashboard import DashboardScreen
+from megamind.services.git_service import GitService
 
 
 def test_conflicted_repo_fixture(conflicted_repo: git.Repo) -> None:
@@ -28,8 +27,8 @@ def test_conflicted_repo_fixture(conflicted_repo: git.Repo) -> None:
 @pytest.mark.anyio
 async def test_navigate_to_conflicts(conflicted_repo: git.Repo) -> None:
     """Pressing 'm' on dashboard with conflicts navigates to ConflictResolutionScreen."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=conflicted_repo.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=conflicted_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -45,14 +44,14 @@ async def test_navigate_to_conflicts(conflicted_repo: git.Repo) -> None:
             title = app.screen.query_one("#conflict-title", Label)
             assert "conflict.txt" in str(title.render())
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]
 
 
 @pytest.mark.anyio
 async def test_conflict_screen_panels_display(conflicted_repo: git.Repo) -> None:
     """Three panels display ours, AI editable center, and theirs content."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=conflicted_repo.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=conflicted_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -72,14 +71,14 @@ async def test_conflict_screen_panels_display(conflicted_repo: git.Repo) -> None
             assert "theirs change on feature" in str(theirs.render())
             assert "ours change on main" in center.text
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]
 
 
 @pytest.mark.anyio
 async def test_ai_resolve_and_apply_flow(conflicted_repo: git.Repo) -> None:
     """Requesting AI resolution and applying resolves and stages the file."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=conflicted_repo.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=conflicted_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -97,11 +96,11 @@ async def test_ai_resolve_and_apply_flow(conflicted_repo: git.Repo) -> None:
             screen.action_request_ai_resolution()
             for _ in range(5):
                 await pilot.pause()
-                if "Resolved by ZIT Mock" in center.text:
+                if "Resolved by MEGAMIND Mock" in center.text:
                     break
 
             # Verify mock resolution was received and loaded
-            assert "Resolved by ZIT Mock" in center.text
+            assert "Resolved by MEGAMIND Mock" in center.text
 
             # Apply hunk suggestion
             screen.action_apply_hunk_suggestion()
@@ -124,14 +123,14 @@ async def test_ai_resolve_and_apply_flow(conflicted_repo: git.Repo) -> None:
             title = screen.query_one("#conflict-title", Label)
             assert "No Conflicts" in str(title.render())
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]
 
 
 @pytest.mark.anyio
 async def test_clean_repo_conflicts_screen(repo_with_commits: git.Repo) -> None:
     """Opening ConflictResolutionScreen on clean repo shows clean state safely."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -147,7 +146,7 @@ async def test_clean_repo_conflicts_screen(repo_with_commits: git.Repo) -> None:
             title = screen.query_one("#conflict-title", Label)
             assert "No Conflicts" in str(title.render())
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]
 
 
 @pytest.mark.anyio
@@ -155,8 +154,8 @@ async def test_conflicts_escape_returns_to_dashboard(
     conflicted_repo: git.Repo,
 ) -> None:
     """Pressing Esc returns from conflicts screen to dashboard."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=conflicted_repo.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=conflicted_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -168,4 +167,4 @@ async def test_conflicts_escape_returns_to_dashboard(
             await pilot.pause()
             assert isinstance(app.screen, DashboardScreen)
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]

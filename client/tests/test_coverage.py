@@ -7,19 +7,18 @@ from pathlib import Path
 
 import git
 import pytest
-
-from zit.app import ZitApp
-from zit.screens.dashboard import DashboardScreen
-from zit.screens.staging import StagingScreen
-from zit.widgets.coverage_modal import CoverageModal
-from zit.widgets.file_list import FileList
-from zit.widgets.input_dialog import InputDialog
+from megamind.app import MegaMindApp
+from megamind.screens.dashboard import DashboardScreen
+from megamind.screens.staging import StagingScreen
+from megamind.widgets.coverage_modal import CoverageModal
+from megamind.widgets.file_list import FileList
+from megamind.widgets.input_dialog import InputDialog
 
 
 @pytest.mark.anyio
 async def test_coverage_modal_direct_save(temp_dir: Path) -> None:
     """CoverageModal renders generated code and saves to chosen filename."""
-    app = ZitApp(repo_path=temp_dir)
+    app = MegaMindApp(repo_path=temp_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -59,8 +58,8 @@ async def test_coverage_modal_direct_save(temp_dir: Path) -> None:
 @pytest.mark.anyio
 async def test_coverage_from_dashboard(dirty_repo: git.Repo) -> None:
     """Pressing 'v' on dashboard file generates coverage and pushes CoverageModal."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=dirty_repo.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=dirty_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -91,7 +90,7 @@ async def test_coverage_from_dashboard(dirty_repo: git.Repo) -> None:
             await pilot.pause()
             assert isinstance(app.screen, DashboardScreen)
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]
         if app._git_service:
             app._git_service.close()
 
@@ -99,8 +98,8 @@ async def test_coverage_from_dashboard(dirty_repo: git.Repo) -> None:
 @pytest.mark.anyio
 async def test_coverage_from_staging(dirty_repo: git.Repo) -> None:
     """Pressing 'v' in staging generates coverage for the highlighted file."""
-    os.environ["ZIT_MOCK"] = "1"
-    app = ZitApp(repo_path=dirty_repo.working_dir)
+    os.environ["MEGAMIND_MOCK"] = "1"
+    app = MegaMindApp(repo_path=dirty_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -123,6 +122,6 @@ async def test_coverage_from_staging(dirty_repo: git.Repo) -> None:
             view = app.screen.query_one("#coverage-code-view", TextArea)
             assert "Generated test suite" in view.text
     finally:
-        del os.environ["ZIT_MOCK"]
+        del os.environ["MEGAMIND_MOCK"]
         if app._git_service:
             app._git_service.close()

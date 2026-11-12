@@ -4,16 +4,15 @@ from __future__ import annotations
 
 import git
 import pytest
+from megamind.app import MegaMindApp
+from megamind.screens.commit import CommitScreen
+from megamind.screens.dashboard import DashboardScreen
 from textual.widgets import TextArea
-
-from zit.app import ZitApp
-from zit.screens.commit import CommitScreen
-from zit.screens.dashboard import DashboardScreen
 
 
 @pytest.mark.anyio
 async def test_navigate_to_commit(dirty_repo: git.Repo) -> None:
-    app = ZitApp(repo_path=dirty_repo.working_dir)
+    app = MegaMindApp(repo_path=dirty_repo.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -37,7 +36,7 @@ async def test_navigate_to_commit(dirty_repo: git.Repo) -> None:
 @pytest.mark.anyio
 async def test_commit_blocks_empty_state(repo_with_commits: git.Repo) -> None:
     """Verifies committing is blocked when nothing is staged or message is empty."""
-    app = ZitApp(repo_path=repo_with_commits.working_dir)
+    app = MegaMindApp(repo_path=repo_with_commits.working_dir)
     try:
         async with app.run_test() as pilot:
             await pilot.pause()
@@ -69,7 +68,7 @@ async def test_commit_blocks_empty_state(repo_with_commits: git.Repo) -> None:
 @pytest.mark.anyio
 async def test_ai_generate_and_commit(dirty_repo: git.Repo) -> None:
     """Verifies key 'g' calls AI message generation and Ctrl+S creates commit."""
-    app = ZitApp(repo_path=dirty_repo.working_dir)
+    app = MegaMindApp(repo_path=dirty_repo.working_dir)
     # Ensure mock mode is active for deterministic testing
     app.api_client.mock = True
 
@@ -92,7 +91,7 @@ async def test_ai_generate_and_commit(dirty_repo: git.Repo) -> None:
 
             text_area = commit_screen.query_one("#commit-message-input", TextArea)
             assert "feat:" in text_area.text
-            assert "ZIT mock" in text_area.text
+            assert "MEGAMIND mock" in text_area.text
 
             # Now commit with Ctrl+S
             await pilot.press("ctrl+s")
